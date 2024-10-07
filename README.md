@@ -1,12 +1,25 @@
-[![CircleCI](https://img.shields.io/circleci/build/github/jcputney/scorm-again/master?style=for-the-badge "CircleCI Build Status")](https://circleci.com/gh/jcputney/scorm-again) [![Code Climate maintainability](https://img.shields.io/codeclimate/maintainability/jcputney/scorm-again?style=for-the-badge)](https://codeclimate.com/github/jcputney/scorm-again) [![Code Climate coverage](https://img.shields.io/codeclimate/coverage/jcputney/scorm-again?style=for-the-badge)](https://codeclimate.com/github/jcputney/scorm-again/trends/test_coverage_total) [![Code Climate technical debt](https://img.shields.io/codeclimate/tech-debt/jcputney/scorm-again?style=for-the-badge)](https://codeclimate.com/github/jcputney/scorm-again/trends/technical_debt) [![Snyk Vulnerabilities for GitHub Repo](https://img.shields.io/snyk/vulnerabilities/github/jcputney/scorm-again?style=for-the-badge) ](https://app.snyk.io/org/jcputney/projects?origin[]=github)
+[![Github Actions](https://img.shields.io/github/actions/workflow/status/jcputney/scorm-again/main.yml?style=for-the-badge "Build Status")](https://github.com/jcputney/scorm-again/actions)
+[![Code Climate maintainability](https://img.shields.io/codeclimate/maintainability/jcputney/scorm-again?style=for-the-badge)](https://codeclimate.com/github/jcputney/scorm-again)
+[![Code Climate coverage](https://img.shields.io/codeclimate/coverage/jcputney/scorm-again?style=for-the-badge)](https://codeclimate.com/github/jcputney/scorm-again/trends/test_coverage_total)
+[![Code Climate technical debt](https://img.shields.io/codeclimate/tech-debt/jcputney/scorm-again?style=for-the-badge)](https://codeclimate.com/github/jcputney/scorm-again/trends/technical_debt)
+![jsDelivr hits (npm)](https://img.shields.io/jsdelivr/npm/hy/scorm-again?style=for-the-badge&label=jsDeliver%20Downloads)
+![NPM Downloads](https://img.shields.io/npm/dy/scorm-again?style=for-the-badge&label=npm%20Downloads)
+![Libraries.io dependency status for GitHub repo](https://img.shields.io/librariesio/github/jcputney/scorm-again?style=for-the-badge) ![npm bundle size](https://img.shields.io/bundlephobia/min/scorm-again?style=for-the-badge)
+[![npm](https://img.shields.io/npm/v/scorm-again?color=%2344cc11&style=for-the-badge)](https://www.npmjs.com/package/scorm-again)
+![GitHub License](https://img.shields.io/github/license/jcputney/scorm-again?style=for-the-badge)
+[![donate](https://img.shields.io/badge/paypal-donate-success?style=for-the-badge)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=NF5MPZJAV26LE)
+
 
 # SCORM Again
 This project was created to modernize the SCORM JavaScript runtime, and to provide a stable, tested platform for running AICC, SCORM 1.2, and SCORM 2004 modules. This module is designed to be LMS agnostic, and is written to be able to be run without a backing LMS, logging all function calls and data instead of committing, if an LMS endpoint is not configured.
 
+## Potential Breaking Change!
+Version 2.0.0 of scorm-again switches to using `fetch`, as well as async-only for reporting to the LMS. Since `fetch` is not supported by IE11, you will need to provide your own polyfill for this functionality if you need to support it.
+
 ### What is this not and what doesn't it do?
 1. This is not an LMS
 1. This does not handle the uploading and verification of SCORM/AICC modules
-1. This project does not **currently** support the TinCan/xAPI runtime, but is it something I am considering in the very near future.
+1. This project does not **currently** support TinCan/xAPI/CMI5, and I'm not sure if I will ever get around to it. However, I would welcome merge requests to add support for any additional specifications.
 1. This library does not setup communication between an external AICC module and an LMS.
 1. This project is not complete! I'm still working on AICC testing, and continuing to write proper test cases for all APIs
 
@@ -15,6 +28,11 @@ This project was created to modernize the SCORM JavaScript runtime, and to provi
 To begin with, you include either the `scorm-again.js` or `scorm-again.min.js` file on your launching page:
 ```html
 <script type="text/javascript" src="/dist/scorm-again.js"></script>
+```
+
+Or, if you would like to only pull in one API, you include either the `aicc.js`, `scorm12.js` or `scorm2004.js` files or their minified versions on your launching page:
+```html
+<script type="text/javascript" src="/dist/scorm2004.js"></script>
 ```
 
 Or, if you would like to install the library using your package manager, you can do the following:
@@ -46,12 +64,19 @@ The APIs include several settings to customize the functionality of each API:
 | ------------- |:-------------:| :-----:| --- |
 | `autocommit`      | false | true/false | Determines whether the API schedules an autocommit to the LMS after setting a value. |
 | `autocommitSeconds`      | 60      |   int | Number of seconds to wait before autocommiting. Timer is restarted if another value is set. |
-| `lmsCommitUrl` | false      |    url | The URL endpoint of the LMS where data should be sent upon commit. If no value is provided, modules will run as usual, but all method calls with just be logged to the console. |
+| `lmsCommitUrl` | false      |    url | The URL endpoint of the LMS where data should be sent upon commit. If no value is provided, modules will run as usual, but all method calls will be logged to the console. |
 | `dataCommitFormat` | `json` | `json`, `flattened`, `params` | `json` will send a JSON object to the lmsCommitUrl in the format of <br>`{'cmi': {'core': {...}}`<br><br> `flattened` will send the data in the format <br>`{'cmi.core.exit': 'suspend', 'cmi.core.mode': 'normal'...}`<br><br> `params` will send the data as <br>`?cmi.core.exit=suspend&cmi.core.mode=normal...` |
 | `commitRequestDataType` | 'application/json;charset=UTF-8' | string | This setting is provided in case your LMS expects a different content type or character set. |
 | `autoProgress` | false | true/false | In case Sequencing is being used, you can tell the API to automatically throw the `SequenceNext` event.|
 | `logLevel` | 4 | int<br><br>1 => DEBUG<br>2 => INFO<br>3 => WARN<br>4 => ERROR<br>5 => NONE | By default, the APIs only log error messages. |
 | `mastery_override` | false | true/false | (SCORM 1.2) Used to override a module's `cmi.core.lesson_status` so that a pass/fail is determined based on a mastery score and the user's raw score, rather than using whatever status is provided by the module. An example of this would be if a module is published using a `Complete/Incomplete` final status, but the LMS always wants to receive a `Passed/Failed` for quizzes, then we can use this setting to override the given final status. |
+| `selfReportSessionTime` | false | true/false | Should the API override the default `session_time` reported by the module? Useful when modules don't properly report time. |
+| `alwaysSendTotalTime` | false | true/false | Should the API always send `total_time` when committing to the LMS |
+| `xhrWithCredentials` | false | true/false | Sets the withCredentials flag on the request to the LMS |
+| `xhrHeaders` | {} | Object | This allows setting of additional headers on the request to the LMS where the key should be the header name and the value is the value of the header you want to send |
+| `responseHandler` | function |  | A function to properly tranform the response from the LMS to the correct format. The APIs expect the result from the LMS to be in the following format (errorCode is optional): `{ "result": true, "errorCode": 0 }` |
+| `requestHandler` | function |  | A function to transform the commit object before sending it to `lmsCommitUrl`. By default it's the identity function (no transformation). |
+| `onLogMessage` | function |  | A function to be called whenever a message is logged. Defaults to console.{error,warn,info,debug,log} |
 
 ## Initial Values
 
@@ -166,6 +191,24 @@ window.API.on("LMSSetValue.cmi.core.student_id", function(CMIElement, value) {
 });
 ```
 
+Finally, you can listen for events using a wildcard:
+
+```javascript
+window.API.on("LMSSetValue.cmi.*", function(CMIElement, value) {
+  [...]
+});
+```
+
+You also have to ability to remove specific callback listeners:
+```javascript
+window.API.off("LMSInitialize", callback);
+```
+
+Or, you can clear all callbacks for a particular event:
+```javascript
+window.API.clear("LMSInitialize");
+```
+
 ### SCORM 2004 Listeners
 
 For convenience, hooks are available for all the SCORM API Signature functions:
@@ -201,6 +244,24 @@ window.API_1484_11.on("SetValue.cmi.learner_id ", function(CMIElement, value) {
 });
 ```
 
+Finally, you can listen for events using a wildcard:
+
+```javascript
+window.API_1484_11.on("SetValue.cmi.* ", function(CMIElement, value) {
+  [...]
+});
+```
+
+You also have to ability to remove specific callback listeners:
+```javascript
+window.API_1484_11.off("Initialize", callback);
+```
+
+Or, you can clear all callbacks for a particular event:
+```javascript
+window.API_1484_11.clear("Initialize");
+```
+
 ### Total Time Calculation
 The APIs provide a convenience method `getCurrentTotalTime()` that can be used for calculating the current `total_time` value, based on the current `session_time` and the `total_time` supplied when the module was launched. This works for both ISO 8601 duration time formats in SCORM 2004 as well as the HH:MM:SS format in SCORM 1.2 and AICC, and outputs the correct format based on the version used.
 
@@ -220,11 +281,10 @@ I also drew from the [Moodle SCORM module](https://github.com/moodle/moodle/tree
 I welcome any and all feedback and contributions to this project! I'm sure it would do with some cleanup and refactoring, and could definitely use some more test cases.
 
 #### Setup and Development
-You will need `node` installed on your local machine, and you'll have to run `npm install` in the repo directory before starting development. 
+You will need `node` installed on your local machine, and you'll have to run `npm install` in the repo directory before starting development.
 
-To run a build, you need to just run the `grunt` command in the root of the project.
+To run a build, you need to just run the `yarn run compile` command in the root of the project.
 
-Similarly, to run the tests, you just run the `grunt test` or `npm test` command.
+Similarly, to run the tests, you just run the `yarn test` command.
 
 Before submitting pull requests, please also run `eslint ./src --fix` against your code first, otherwise your pull request build could fail.
-
