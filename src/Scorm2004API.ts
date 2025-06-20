@@ -499,8 +499,9 @@ class Scorm2004API extends BaseAPI {
    * @param {string} CMIElement
    * @return {*}
    */
-  override getCMIValue(CMIElement: string): any {
-    return this._commonGetCMIValue("GetValue", true, CMIElement);
+  override getCMIValue(CMIElement: string): string {
+    const value = this._commonGetCMIValue("GetValue", true, CMIElement);
+    return value === undefined ? "" : String(value);
   }
 
   /**

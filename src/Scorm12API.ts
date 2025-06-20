@@ -207,8 +207,9 @@ class Scorm12API extends BaseAPI {
    * @param {string} CMIElement
    * @return {*}
    */
-  override getCMIValue(CMIElement: string): any {
-    return this._commonGetCMIValue("getCMIValue", false, CMIElement);
+  override getCMIValue(CMIElement: string): string {
+    const value = this._commonGetCMIValue("getCMIValue", false, CMIElement);
+    return value === undefined ? "" : String(value);
   }
 
   /**

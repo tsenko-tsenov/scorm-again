@@ -10380,7 +10380,8 @@ class Scorm2004API extends BaseAPI {
    * @return {*}
    */
   getCMIValue(CMIElement) {
-    return this._commonGetCMIValue("GetValue", true, CMIElement);
+    const value = this._commonGetCMIValue("GetValue", true, CMIElement);
+    return value === void 0 ? "" : String(value);
   }
   /**
    * Returns the message that corresponds to errorNumber.

@@ -288,7 +288,7 @@ describe("AICC API Tests", () => {
       aiccAPI.reset();
       expect(aiccAPI.cmi.interactions).toEqual(new CMIInteractions());
       expect(aiccAPI.cmi.core.student_id).toEqual("student_1");
-      expect(aiccAPI.getCMIValue("cmi.student_data.tries")).toEqual(new CMITries());
+      expect(aiccAPI.getCMIValue("cmi.student_data.tries._count")).toEqual("0");
     });
 
     it("should keep original settings", () => {

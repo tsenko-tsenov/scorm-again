@@ -4625,7 +4625,8 @@ class Scorm12API extends BaseAPI {
    * @return {*}
    */
   getCMIValue(CMIElement) {
-    return this._commonGetCMIValue("getCMIValue", false, CMIElement);
+    const value = this._commonGetCMIValue("getCMIValue", false, CMIElement);
+    return value === void 0 ? "" : String(value);
   }
   /**
    * Gets or builds a new child element to add to the array.
