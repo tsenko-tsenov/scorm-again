@@ -2175,16 +2175,17 @@ this.Scorm12API = (function () {
      * @private
      */
     _handleImmediateRequest(url, params, apiLog, processListeners) {
+      const processedParams = this.settings.requestHandler(params);
       if (this.settings.useBeaconInsteadOfFetch !== "never") {
         const {
           body,
           contentType
-        } = this._prepareRequestBody(params);
+        } = this._prepareRequestBody(processedParams);
         navigator.sendBeacon(url, new Blob([body], {
           type: contentType
         }));
       } else {
-        this.performFetch(url, params).then(async response => {
+        this.performFetch(url, processedParams).then(async response => {
           await this.transformResponse(response, processListeners);
         }).catch(e => {
           const message = e instanceof Error ? e.message : String(e);
@@ -4481,4 +4482,3 @@ ${stackTrace}`);
   return Scorm12API;
 
 })();
-//# sourceMappingURL=scorm12.js.map

@@ -152,13 +152,19 @@ export class HttpService implements IHttpService {
     ) => void,
     processListeners: (functionName: string, CMIElement?: string, value?: any) => void,
   ): ResultObject {
+    // Apply the request handler to transform the commit object before sending
+    const processedParams = this.settings.requestHandler(params) as
+      | CommitObject
+      | StringKeyMap
+      | Array<any>;
+
     // Use Beacon API for final commit if specified in settings
     if (this.settings.useBeaconInsteadOfFetch !== "never") {
-      const { body, contentType } = this._prepareRequestBody(params);
+      const { body, contentType } = this._prepareRequestBody(processedParams);
       navigator.sendBeacon(url, new Blob([body], { type: contentType }));
     } else {
       // Use regular fetch with keepalive
-      this.performFetch(url, params)
+      this.performFetch(url, processedParams)
         .then(async (response) => {
           await this.transformResponse(response, processListeners);
         })

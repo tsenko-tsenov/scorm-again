@@ -307,6 +307,77 @@ describe("HttpService", () => {
       // requestHandlerSpy.restore() - not needed with vi.restoreAllMocks()
     });
 
+    it("should call requestHandler with params for immediate requests", async () => {
+      const url = "https://example.com/api";
+      const params = { data: "test" };
+      const mockResponse = new Response(
+        JSON.stringify({ result: global_constants.SCORM_TRUE, errorCode: 0 }),
+      );
+      fetchStub.mockImplementation(() => mockResponse);
+      const requestHandlerSpy = vi.spyOn(settings, "requestHandler");
+
+      await httpService.processHttpRequest(url, params, true, apiLogStub, processListenersStub);
+
+      expect(requestHandlerSpy).toHaveBeenCalledOnce();
+      expect(requestHandlerSpy).toHaveBeenCalledWith(params);
+    });
+
+    it("should call requestHandler with params for immediate requests using sendBeacon", async () => {
+      const url = "https://example.com/api";
+      const params = { data: "test" };
+      settings.useBeaconInsteadOfFetch = "on-terminate";
+      httpService.updateSettings(settings);
+      const requestHandlerSpy = vi.spyOn(settings, "requestHandler");
+
+      await httpService.processHttpRequest(url, params, true, apiLogStub, processListenersStub);
+
+      expect(requestHandlerSpy).toHaveBeenCalledOnce();
+      expect(requestHandlerSpy).toHaveBeenCalledWith(params);
+      expect(sendBeaconStub).toHaveBeenCalledOnce();
+    });
+
+    it("should apply requestHandler transformations during immediate requests", async () => {
+      const url = "https://example.com/api";
+      const originalParams = { cmi: { core: { lesson_status: "incomplete" } } };
+      const expectedTransformedParams = { cmi: { core: { lesson_status: "completed" } } };
+      
+      // Set up a request handler that transforms the lesson status
+      settings.requestHandler = (params: any) => {
+        const transformed = JSON.parse(JSON.stringify(params)); // Deep copy
+        if (transformed.cmi && transformed.cmi.core) {
+          transformed.cmi.core.lesson_status = "completed";
+        }
+        return transformed;
+      };
+      httpService.updateSettings(settings);
+
+      const requestHandlerSpy = vi.spyOn(settings, "requestHandler");
+
+      await httpService.processHttpRequest(url, originalParams, true, apiLogStub, processListenersStub);
+
+      expect(requestHandlerSpy).toHaveBeenCalledOnce();
+      expect(requestHandlerSpy).toHaveBeenCalledWith(originalParams);
+      
+      // Verify that the transformed data was used (check what was sent to fetch or sendBeacon)
+      if (fetchStub.mock.calls.length > 0) {
+        const fetchCallBody = (fetchStub.mock.calls[0][1] as any).body;
+        const sentData = JSON.parse(fetchCallBody);
+        expect(sentData.cmi.core.lesson_status).toBe("completed");
+      } else if (sendBeaconStub.mock.calls.length > 0) {
+        // For sendBeacon, we need to read the blob data
+        const blob = sendBeaconStub.mock.calls[0][1] as Blob;
+        const reader = new FileReader();
+        return new Promise((resolve) => {
+          reader.onload = () => {
+            const sentData = JSON.parse(reader.result as string);
+            expect(sentData.cmi.core.lesson_status).toBe("completed");
+            resolve(undefined);
+          };
+          reader.readAsText(blob);
+        });
+      }
+    });
+
     it("should call responseHandler with response", async () => {
       const url = "https://example.com/api";
       const params = { data: "test" };
