@@ -302,7 +302,10 @@ export default class Scorm12API extends BaseAPI {
     if (this.settings.lmsCommitUrl) {
       return this.processHttpRequest(this.settings.lmsCommitUrl, commitObject, terminateCommit);
     } else {
-      return global_constants.SCORM_TRUE;
+      return {
+        result: global_constants.SCORM_TRUE,
+        errorCode: 0,
+      };
     }
   }
 }

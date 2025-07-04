@@ -165,7 +165,7 @@ export default class BaseAPI {
   terminate(
       callbackName: String,
       checkTerminated: boolean) {
-    let returnValue = global_constants.SCORM_FALSE;
+    let returnValue = global_constants.SCORM_TRUE;
 
     if (this.checkState(checkTerminated,
         this.#error_codes.TERMINATION_BEFORE_INIT,
@@ -309,7 +309,7 @@ export default class BaseAPI {
       checkTerminated: boolean) {
     this.clearScheduledCommit();
 
-    let returnValue = global_constants.SCORM_FALSE;
+    let returnValue = global_constants.SCORM_TRUE;
 
     if (this.checkState(checkTerminated, this.#error_codes.COMMIT_BEFORE_INIT,
         this.#error_codes.COMMIT_AFTER_TERM)) {

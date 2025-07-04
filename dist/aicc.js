@@ -782,7 +782,7 @@ var BaseAPI = /*#__PURE__*/function () {
   }, {
     key: "terminate",
     value: function terminate(callbackName, checkTerminated) {
-      var returnValue = global_constants.SCORM_FALSE;
+      var returnValue = global_constants.SCORM_TRUE;
 
       if (this.checkState(checkTerminated, _classPrivateFieldGet(this, _error_codes).TERMINATION_BEFORE_INIT, _classPrivateFieldGet(this, _error_codes).MULTIPLE_TERMINATION)) {
         this.currentState = global_constants.STATE_TERMINATED;
@@ -913,7 +913,7 @@ var BaseAPI = /*#__PURE__*/function () {
     key: "commit",
     value: function commit(callbackName, checkTerminated) {
       this.clearScheduledCommit();
-      var returnValue = global_constants.SCORM_FALSE;
+      var returnValue = global_constants.SCORM_TRUE;
 
       if (this.checkState(checkTerminated, _classPrivateFieldGet(this, _error_codes).COMMIT_BEFORE_INIT, _classPrivateFieldGet(this, _error_codes).COMMIT_AFTER_TERM)) {
         var result = this.storeData(false);
@@ -2347,7 +2347,10 @@ var Scorm12API = /*#__PURE__*/function (_BaseAPI) {
       if (this.settings.lmsCommitUrl) {
         return this.processHttpRequest(this.settings.lmsCommitUrl, commitObject, terminateCommit);
       } else {
-        return global_constants.SCORM_TRUE;
+        return {
+          result: global_constants.SCORM_TRUE,
+          errorCode: 0
+        };
       }
     }
   }]);

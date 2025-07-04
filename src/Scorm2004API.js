@@ -566,7 +566,10 @@ export default class Scorm2004API extends BaseAPI {
       }
       return result;
     } else {
-      return global_constants.SCORM_TRUE;
+      return {
+        result: global_constants.SCORM_TRUE,
+        errorCode: 0,
+      };
     }
   }
 }
